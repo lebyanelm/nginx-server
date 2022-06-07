@@ -1,0 +1,58 @@
+# template from "rmorshea/docker-flask-template"
+version: '3.7'
+services:
+  # hetch accounts management and session management
+  hetch_accounts:
+    build: ./hetch-accounts
+    restart: always
+    environment:
+      # defining the environment for production and development purposes
+      ENVIRONMENT: production
+      SELF_ENDPOINT: https://0260-105-8-3-233.ngrok.io/hetch-accounts
+
+      # production app environment
+      SEED: 20180175ca60a0129
+
+      # database management and connection
+      MONGODB_CONNECTION: mongodb+srv://hetchfund:mLbUlvLgChZPgpsG@cluster0.tlmjm.mongodb.net/?retryWrites=true&w=majority
+      DATABASE_NAME: hetchfund_capital
+    expose:
+      - 4000
+    dns:
+      - 8.8.8.8
+
+  hetch_payments:
+    build: ./hetch-payment
+    restart: always
+    environment:
+      # defining the environment for production and development purposes
+      ENVIRONMENT: production
+      SELF_ENDPOINT: https://0260-105-8-3-233.ngrok.io/hetch-payments
+
+      # peach payments api credentials for issueing transactions
+      PEACH_3D_ENTITY_ID: 8ac7a4c9801624b20180175ca60a0129
+      PEACH_AUTHORIZATION: OGFjN2E0Yzk4MDE2MjRiMjAxODAxNzVjOTczYzAxMjJ8bXBzMkZkcnFKNQ==
+      PEACH_ENDPOINT: https://oppwa.com/v1
+      SANDBOX_PEACH_ENDPOINT: https://test.oppwa.com/v1
+
+      # database management and connection
+      MONGODB_CONNECTION: mongodb+srv://hetchfund:mLbUlvLgChZPgpsG@cluster0.tlmjm.mongodb.net/?retryWrites=true&w=majority
+      DATABASE_NAME: hetchfund_capital
+    expose:
+      - 4001
+
+  hetch_translator:
+    build: ./hetch-translator
+    restart: always
+    environment:
+      ENVIRONMENT: production
+      OE_KEY: 0b50be4c4ae948579264ff4728a2daa3
+    expose:
+      - 4002
+
+  # nginx to be used for reverse proxying and serving requests
+  nginx:
+    build: ./nginx
+    restart: always
+    ports:
+      - "80:80"
